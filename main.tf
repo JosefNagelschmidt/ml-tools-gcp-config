@@ -26,3 +26,26 @@ resource "google_storage_bucket" "tf-state" {
     enabled = true
   }
 }
+
+
+variable "gcp_service_list" {
+  description = "The list of apis necessary for the project"
+  type        = list(string)
+  default = [
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "logging.googleapis.com",
+    "pubsub.googleapis.com",
+    "storage.googleapis.com",
+    "storage-component.googleapis.com",
+    "storage-api.googleapis.com",
+    "cloudfunctions.googleapis.com",
+    "eventarc.googleapis.com"
+  ]
+}
+
+resource "google_project_service" "gcp_services" {
+  for_each = toset(var.gcp_service_list)
+  project  = "tokyo-house-366821"
+  service  = each.key
+}
