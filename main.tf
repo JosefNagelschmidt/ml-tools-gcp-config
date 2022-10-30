@@ -27,6 +27,12 @@ resource "google_storage_bucket" "tf-state" {
   }
 }
 
+resource "google_storage_bucket" "osm" {
+  name          = "bucket-osm-9755a02f7829dc9a"
+  force_destroy = false
+  location      = "us-west1"
+  storage_class = "STANDARD"
+}
 
 variable "gcp_service_list" {
   description = "The list of apis necessary for the project"
@@ -48,4 +54,10 @@ resource "google_project_service" "gcp_services" {
   for_each = toset(var.gcp_service_list)
   project  = "tokyo-house-366821"
   service  = each.key
+}
+
+resource "google_project_iam_member" "cloud-storage-pubsub-publishing" {
+  project = "tokyo-house-366821"
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:service-342412401470@gs-project-accounts.iam.gserviceaccount.com"
 }
