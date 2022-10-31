@@ -46,7 +46,8 @@ variable "gcp_service_list" {
     "storage-component.googleapis.com",
     "storage-api.googleapis.com",
     "cloudfunctions.googleapis.com",
-    "eventarc.googleapis.com"
+    "eventarc.googleapis.com",
+    "compute.googleapis.com"
   ]
 }
 
@@ -60,4 +61,31 @@ resource "google_project_iam_member" "cloud-storage-pubsub-publishing" {
   project = "tokyo-house-366821"
   role    = "roles/pubsub.publisher"
   member  = "serviceAccount:service-342412401470@gs-project-accounts.iam.gserviceaccount.com"
+}
+
+resource "google_service_account" "github-actions-sa" {
+  project      = "tokyo-house-366821"
+  account_id   = "github-actions-sa"
+  display_name = "github-actions-sa"
+}
+
+resource "google_project_iam_member" "github-actions-sa-cloud-functions-deploy" {
+  project = "tokyo-house-366821"
+  role    = "roles/cloudfunctions.admin"
+  member  = "serviceAccount:${google_service_account.github-actions-sa.email}"
+}
+
+data "google_compute_default_service_account" "default" {
+}
+
+resource "google_service_account_iam_member" "github-actions-sa-act-as-runtime" {
+  service_account_id = data.google_compute_default_service_account.default.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.github-actions-sa.email}"
+}
+
+resource "google_service_account_iam_member" "cloud-build-sa-act-as-runtime" {
+  service_account_id = data.google_compute_default_service_account.default.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:342412401470@cloudbuild.gserviceaccount.com"
 }
