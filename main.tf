@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "3.5.0"
+      version = "4.42.0"
     }
   }
   backend "gcs" {
@@ -69,23 +69,29 @@ resource "google_service_account" "github-actions-sa" {
   display_name = "github-actions-sa"
 }
 
+resource "google_project_iam_member" "github-actions-sa-token-generation" {
+  project = "tokyo-house-366821"
+  role    = "roles/iam.serviceAccountTokenCreator"
+  member  = "serviceAccount:${google_service_account.github-actions-sa.email}"
+}
+
 resource "google_project_iam_member" "github-actions-sa-cloud-functions-deploy" {
   project = "tokyo-house-366821"
   role    = "roles/cloudfunctions.admin"
   member  = "serviceAccount:${google_service_account.github-actions-sa.email}"
 }
 
-data "google_compute_default_service_account" "default" {
+data "google_app_engine_default_service_account" "default" {
 }
 
 resource "google_service_account_iam_member" "github-actions-sa-act-as-runtime" {
-  service_account_id = data.google_compute_default_service_account.default.name
+  service_account_id = data.google_app_engine_default_service_account.default.name
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.github-actions-sa.email}"
 }
 
 resource "google_service_account_iam_member" "cloud-build-sa-act-as-runtime" {
-  service_account_id = data.google_compute_default_service_account.default.name
+  service_account_id = data.google_app_engine_default_service_account.default.name
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:342412401470@cloudbuild.gserviceaccount.com"
 }
