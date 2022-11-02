@@ -34,6 +34,13 @@ resource "google_storage_bucket" "osm" {
   storage_class = "STANDARD"
 }
 
+resource "google_storage_bucket" "osm-cities" {
+  name          = "bucket-osm-cities-9755a02f7829dc9a"
+  force_destroy = false
+  location      = "us-west1"
+  storage_class = "STANDARD"
+}
+
 variable "gcp_service_list" {
   description = "The list of apis necessary for the project"
   type        = list(string)
