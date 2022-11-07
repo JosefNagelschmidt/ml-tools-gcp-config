@@ -113,3 +113,15 @@ resource "google_pubsub_topic" "pubsub-topic-google-directions-trigger" {
   }
   message_retention_duration = "86600s"
 }
+
+# resource "google_cloud_scheduler_job" "google-directions-cron-job" {
+#   name        = "google-directions-cron-job"
+#   description = "google-directions-cron-job"
+#   schedule    = "* * * * *"
+
+#   pubsub_target {
+#     # topic.id is the topic's full resource name.
+#     topic_name = google_pubsub_topic.pubsub-topic-google-directions-trigger.id
+#     data       = base64encode("test")
+#   }
+# }
