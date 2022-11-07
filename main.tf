@@ -54,7 +54,8 @@ variable "gcp_service_list" {
     "storage-api.googleapis.com",
     "cloudfunctions.googleapis.com",
     "eventarc.googleapis.com",
-    "compute.googleapis.com"
+    "compute.googleapis.com",
+    "cloudscheduler.googleapis.com"
   ]
 }
 
