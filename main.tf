@@ -103,3 +103,13 @@ resource "google_service_account_iam_member" "cloud-build-sa-act-as-runtime" {
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:342412401470@cloudbuild.gserviceaccount.com"
 }
+
+resource "google_pubsub_topic" "pubsub-topic-google-directions-trigger" {
+  name = "pubsub-topic-google-directions-trigger"
+  message_storage_policy {
+    allowed_persistence_regions = [
+      "us-west1",
+    ]
+  }
+  message_retention_duration = "86600s"
+}
