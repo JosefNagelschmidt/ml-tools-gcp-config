@@ -48,6 +48,13 @@ resource "google_storage_bucket" "city-population-grids" {
   storage_class = "STANDARD"
 }
 
+resource "google_storage_bucket" "general-configs" {
+  name          = "bucket-general-config-files"
+  force_destroy = false
+  location      = "us-west1"
+  storage_class = "STANDARD"
+}
+
 variable "gcp_service_list" {
   description = "The list of apis necessary for the project"
   type        = list(string)
