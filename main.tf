@@ -41,6 +41,13 @@ resource "google_storage_bucket" "osm-cities" {
   storage_class = "STANDARD"
 }
 
+resource "google_storage_bucket" "city-population-grids" {
+  name          = "bucket-city-population-grids"
+  force_destroy = false
+  location      = "us-west1"
+  storage_class = "STANDARD"
+}
+
 variable "gcp_service_list" {
   description = "The list of apis necessary for the project"
   type        = list(string)
