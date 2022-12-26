@@ -69,7 +69,9 @@ variable "gcp_service_list" {
     "cloudfunctions.googleapis.com",
     "eventarc.googleapis.com",
     "compute.googleapis.com",
-    "cloudscheduler.googleapis.com"
+    "cloudscheduler.googleapis.com",
+    "distance-matrix-backend.googleapis.com",
+    "apikeys.googleapis.com"
   ]
 }
 
