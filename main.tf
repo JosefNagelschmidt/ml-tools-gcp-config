@@ -241,6 +241,18 @@ resource "google_bigquery_table" "stops" {
     "description": "Origin or destination of journey"
   },
   {
+    "name": "latitude",
+    "type": "FLOAT64",
+    "mode": "REQUIRED",
+    "description": "Latitude"
+  },
+  {
+    "name": "longitude",
+    "type": "FLOAT64",
+    "mode": "REQUIRED",
+    "description": "Longitude"
+  },
+  {
     "name": "house_number",
     "type": "STRING",
     "mode": "NULLABLE",
