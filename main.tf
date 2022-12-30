@@ -130,68 +130,76 @@ resource "google_pubsub_topic" "pubsub-topic-google-directions-trigger" {
   message_retention_duration = "86600s"
 }
 
-resource "google_bigquery_dataset" "dataset_journey" {
-  dataset_id  = "dataset_journey"
+resource "google_bigquery_dataset" "urban_transport_monitor" {
+  dataset_id  = "urban_transport_monitor"
   description = "Dataset consisting of journeys between two points."
   location    = "us-west1"
 }
 
-resource "google_bigquery_table" "journey_durations" {
-  dataset_id = google_bigquery_dataset.dataset_journey.dataset_id
-  table_id   = "journey_durations"
+resource "google_bigquery_table" "journeys" {
+  dataset_id = google_bigquery_dataset.urban_transport_monitor.dataset_id
+  table_id   = "journeys"
 
   time_partitioning {
     type                     = "DAY"
-    field                    = "id_origin"
+    field                    = "insertion_time"
     require_partition_filter = true
   }
+
+  deletion_protection = false
 
   schema = <<EOF
 [
   {
-    "name": "id_origin",
-    "type": "TIMESTAMP",
+    "name": "origin",
+    "type": "INT64",
     "mode": "REQUIRED",
     "description": "Foreign key of origin for metadata table, generated from timestamp"
   },
   {
-    "name": "id_destination",
-    "type": "TIMESTAMP",
+    "name": "destination",
+    "type": "INT64",
     "mode": "REQUIRED",
     "description": "Foreign key of destination for metadata table, generated from timestamp"
   },
   {
-    "name": "driving_duration_in_s",
+    "name": "insertion_time",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Insertion time"
+  },
+  {
+    "name": "driving_duration",
     "type": "INT64",
     "mode": "NULLABLE",
     "description": "Driving duration in seconds"
   },
   {
-    "name": "transit_duration_in_s",
+    "name": "transit_duration",
     "type": "INT64",
     "mode": "NULLABLE",
     "description": "Transit duration in seconds"
   },
   {
-    "name": "bicycling_duration_in_s",
+    "name": "bicycling_duration",
     "type": "INT64",
     "mode": "NULLABLE",
     "description": "Cycling duration in seconds"
   },
   {
-    "name": "driving_distance_in_m",
+    "name": "driving_distance",
     "type": "INT64",
     "mode": "NULLABLE",
     "description": "Driving distance in meter"
   },
   {
-    "name": "transit_distance_in_m",
+    "name": "transit_distance",
     "type": "INT64",
     "mode": "NULLABLE",
     "description": "Transit distance in meter"
   },
   {
-    "name": "bicycling_distance_in_m",
+    "name": "bicycling_distance",
     "type": "INT64",
     "mode": "NULLABLE",
     "description": "Cycling distance in meter"
@@ -200,28 +208,36 @@ resource "google_bigquery_table" "journey_durations" {
 EOF
 }
 
-resource "google_bigquery_table" "journey_metadata" {
-  dataset_id = google_bigquery_dataset.dataset_journey.dataset_id
-  table_id   = "journey_metadata"
+resource "google_bigquery_table" "stops" {
+  dataset_id = google_bigquery_dataset.urban_transport_monitor.dataset_id
+  table_id   = "stops"
 
   time_partitioning {
     type                     = "DAY"
-    field                    = "id"
+    field                    = "insertion_time"
     require_partition_filter = true
   }
+
+  deletion_protection = false
 
   schema = <<EOF
 [
   {
     "name": "id",
+    "type": "INT64",
+    "mode": "REQUIRED",
+    "description": "Primary key with unix time of insertion"
+  },
+  {
+    "name": "insertion_time",
     "type": "TIMESTAMP",
     "mode": "REQUIRED",
-    "description": "Primary key, reflecting time of generation"
+    "description": "Insertion time"
   },
   {
     "name": "type",
     "type": "STRING",
-    "mode": "NULLABLE",
+    "mode": "REQUIRED",
     "description": "Origin or destination of journey"
   },
   {
