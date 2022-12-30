@@ -130,6 +130,165 @@ resource "google_pubsub_topic" "pubsub-topic-google-directions-trigger" {
   message_retention_duration = "86600s"
 }
 
+resource "google_bigquery_dataset" "dataset_journey" {
+  dataset_id  = "dataset_journey"
+  description = "Dataset consisting of journeys between two points."
+  location    = "us-west1"
+}
+
+resource "google_bigquery_table" "journey_durations" {
+  dataset_id = google_bigquery_dataset.dataset_journey.dataset_id
+  table_id   = "journey_durations"
+
+  time_partitioning {
+    type                     = "DAY"
+    field                    = "id_origin"
+    require_partition_filter = true
+  }
+
+  schema = <<EOF
+[
+  {
+    "name": "id_origin",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Foreign key of origin for metadata table, generated from timestamp"
+  },
+  {
+    "name": "id_destination",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Foreign key of destination for metadata table, generated from timestamp"
+  },
+  {
+    "name": "driving_duration_in_s",
+    "type": "INT64",
+    "mode": "NULLABLE",
+    "description": "Driving duration in seconds"
+  },
+  {
+    "name": "transit_duration_in_s",
+    "type": "INT64",
+    "mode": "NULLABLE",
+    "description": "Transit duration in seconds"
+  },
+  {
+    "name": "bicycling_duration_in_s",
+    "type": "INT64",
+    "mode": "NULLABLE",
+    "description": "Cycling duration in seconds"
+  },
+  {
+    "name": "driving_distance_in_m",
+    "type": "INT64",
+    "mode": "NULLABLE",
+    "description": "Driving distance in meter"
+  },
+  {
+    "name": "transit_distance_in_m",
+    "type": "INT64",
+    "mode": "NULLABLE",
+    "description": "Transit distance in meter"
+  },
+  {
+    "name": "bicycling_distance_in_m",
+    "type": "INT64",
+    "mode": "NULLABLE",
+    "description": "Cycling distance in meter"
+  }
+]
+EOF
+}
+
+resource "google_bigquery_table" "journey_metadata" {
+  dataset_id = google_bigquery_dataset.dataset_journey.dataset_id
+  table_id   = "journey_metadata"
+
+  time_partitioning {
+    type                     = "DAY"
+    field                    = "id"
+    require_partition_filter = true
+  }
+
+  schema = <<EOF
+[
+  {
+    "name": "id",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Primary key, reflecting time of generation"
+  },
+  {
+    "name": "type",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Origin or destination of journey"
+  },
+  {
+    "name": "house_number",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "House number"
+  },
+  {
+    "name": "road",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Road"
+  },
+  {
+    "name": "neighbourhood",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Neighbourhood"
+  },
+  {
+    "name": "suburb",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Suburb"
+  },
+  {
+    "name": "city_district",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "City district"
+  },
+  {
+    "name": "city",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "City"
+  },
+  {
+    "name": "state",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "State"
+  },
+  {
+    "name": "postcode",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Postcode"
+  },
+  {
+    "name": "country",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Country"
+  },
+  {
+    "name": "country_code",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Country code"
+  }
+]
+EOF
+}
+
+
 # resource "google_cloud_scheduler_job" "google-directions-cron-job" {
 #   name        = "google-directions-cron-job"
 #   description = "google-directions-cron-job"
